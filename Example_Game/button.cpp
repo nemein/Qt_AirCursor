@@ -1,4 +1,16 @@
+/*
+    Air Cursor library for Qt applications using Kinect
+    Copyright (C) 2012 Tuomas Haapala, Nemein
+
+    ---
+
+    Part of the game example.
+
+    This class implements the simple yet gorgeous grabbable buttons.
+*/
+
 #include "button.h"
+
 #include <QPainter>
 
 Button::Button(QString text, QPoint position, QPointF size, QGraphicsObject *parent) :

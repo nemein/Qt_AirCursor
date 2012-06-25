@@ -1,4 +1,13 @@
-// main game logic class
+/*
+    Air Cursor library for Qt applications using Kinect
+    Copyright (C) 2012 Tuomas Haapala, Nemein
+
+    ---
+
+    Part of the game example.
+
+    This class handles the main game functionality.
+*/
 
 #ifndef GAME_H
 #define GAME_H
@@ -22,9 +31,9 @@ signals:
 public slots:
     void start();
 
+    // slots called from air cursor
     void handCreate();
     void handDestroy();
-
     void handUpdate(qreal x, qreal y, qreal z);
     void grab(qreal x, qreal y);
     void grabRelease(qreal x, qreal y);

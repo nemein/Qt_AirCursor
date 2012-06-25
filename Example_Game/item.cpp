@@ -1,5 +1,15 @@
+/*
+    Air Cursor library for Qt applications using Kinect
+    Copyright (C) 2012 Tuomas Haapala, Nemein
+
+    ---
+
+    Part of the game example.
+
+    This class represents a grabbable moving "enemy" in the game.
+*/
+
 #include "item.h"
-#include <QDebug>
 #include <QVector>
 #include <QGraphicsScene>
 

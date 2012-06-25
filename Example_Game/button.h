@@ -1,4 +1,13 @@
-// simple button for grabbing
+/*
+    Air Cursor library for Qt applications using Kinect
+    Copyright (C) 2012 Tuomas Haapala, Nemein
+
+    ---
+
+    Part of the game example.
+
+    This class implements the simple yet gorgeous grabbable buttons.
+*/
 
 #ifndef BUTTON_H
 #define BUTTON_H

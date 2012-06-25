@@ -9,7 +9,6 @@
 #include <QThread>
 #include <QMutex>
 #include <QImage>
-#include <QSettings>
 #include <iostream>
 
 #include <XnOpenNI.h>
@@ -22,80 +21,61 @@ class AirCursor : public QThread
     Q_OBJECT
 public:
 
-    // singleton pattern
-    static AirCursor* instance()
-    {
-        if (!m_instance)
-        {
-            static QMutex mutex;
-            mutex.lock();
-
-            if (!m_instance)
-                m_instance = new AirCursor();
-
-            mutex.unlock();
-        }
-
-        return m_instance;
-    }
-
-    static void drop()
-    {
-        static QMutex mutex;
-        mutex.lock();
-        delete m_instance;
-        m_instance = 0;
-        mutex.unlock();
-    }
-
+    explicit AirCursor(QObject *parent = 0);
     ~AirCursor();
 
     bool init(bool makeDebugImage = false);
 
     virtual void run();
+    void stop();
 
 signals:
+    // most of these signals are straight equivalents of openni/nite callbacks
 
+    // emitted when hand tracking starts/stops
     void handCreate(qreal x, qreal y, qreal z, qreal time);
     void handDestroy(qreal time);
 
+    // emitted when full focus gesture is detected
     void gestureRecognized(QString gestureStr);
+
+    // emitted when partial focus gesture is detected
     void gestureProcess(QString gestureStr);
 
+    // emitted when hand tracking session starts/stops
     void sessionStart();
     void sessionEnd();
 
+    // emitted when hand position is updated
     void handUpdate(qreal x, qreal y, qreal z, qreal time, bool grab);
+
+    // emitted when push gesture is detected
     void push(qreal x, qreal y, qreal z, qreal velocity, qreal angle);
 
+    // emitted when grab state changes
     void grab(qreal x, qreal y, qreal z);
     void grabRelease(qreal x, qreal y, qreal z);
 
+    // emitted when hand is too near/far
     void handTooClose();
     void handTooFar();
 
-    void debugImageUpdate(QImage image);
+    // emitted when debug image is updated
+    void debugUpdate(QImage image, QList<QString> strings);
 
+    // emitted when swipe gesture is detected
     void swipeUp(qreal velocity, qreal angle);
     void swipeDown(qreal velocity, qreal angle);
     void swipeLeft(qreal velocity, qreal angle);
     void swipeRight(qreal velocity, qreal angle);
 
-public slots:
-    void quit();
-
-    void stopRunning();
-
 private:
-
-    explicit AirCursor(QObject *parent = 0);
 
     void analyzeGrab();
     void updateState();
     void newHandPoint(qreal x, qreal y, qreal z);
 
-    QList<XnPoint3D> m_handPoints;
-
+    // callbacks
     static void XN_CALLBACK_TYPE gestureRecognizedCB(xn::GestureGenerator& generator,
                                 const XnChar* strGesture,
                                 const XnPoint3D* pIDPosition,
@@ -125,7 +105,7 @@ private:
     static void XN_CALLBACK_TYPE swipeLeftCB(XnFloat fVelocity, XnFloat fAngle, void* cxt);
     static void XN_CALLBACK_TYPE swipeRightCB(XnFloat fVelocity, XnFloat fAngle, void* cxt);
 
-    static AirCursor* m_instance;
+    QList<XnPoint3D> m_handPoints;
 
     xn::Context m_context;
 

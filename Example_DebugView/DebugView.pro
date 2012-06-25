@@ -1,17 +1,15 @@
 QT       += core gui
 
-HEADERS += \
-    game.h \
-    item.h \
-    button.h \
-    aircursor.h
+TARGET = DebugView
+TEMPLATE = app
 
-SOURCES += \
-    game.cpp \
-    main.cpp \
-    item.cpp \
-    button.cpp \
-    aircursor.cpp
+
+SOURCES += main.cpp\
+        debugview.cpp \
+        ../aircursor.cpp
+
+HEADERS += debugview.h \
+        ../aircursor.h
 
 INCLUDEPATH += /usr/include/ni
 DEPENDPATH += /usr/include/ni
@@ -22,5 +20,10 @@ DEPENDPATH += /usr/include/nite
 INCLUDEPATH += /usr/include/opencv
 DEPENDPATH += /usr/include/opencv
 
+INCLUDEPATH += ../
+DEPENDPATH += ../
+
 LIBS += -lOpenNI -lXnVNite_1_5_2 -lXnVHandGenerator_1_5_2
 LIBS += -lopencv_core -lopencv_imgproc
+
+

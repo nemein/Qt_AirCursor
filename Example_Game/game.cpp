@@ -1,9 +1,19 @@
+/*
+    Air Cursor library for Qt applications using Kinect
+    Copyright (C) 2012 Tuomas Haapala, Nemein
+
+    ---
+
+    Part of the game example.
+
+    This class handles the main game functionality.
+*/
+
 #include "game.h"
+#include "button.h"
 
 #include <QCoreApplication>
 #include <QTime>
-
-#include "button.h"
 
 const quint16 FPS = 30;
 
@@ -23,7 +33,6 @@ const qreal BUTTON_Y_SIZE = 0.30;
 const qreal MOUSE_SIZE = 0.20;
 const qreal JOYSTICK_SIZE = 0.30;
 const qreal TABLET_SIZE = 0.35;
-
 
 // values determining game speed increase
 const qint16 START_ITEM_SPAWN_INTERVAL = 3000;
@@ -54,7 +63,7 @@ Game::Game(QSize size, QObject *parent) :
     m_mousePixmap = new QPixmap("img/mouse.png");
     m_joystickPixmap = new QPixmap("img/joystick.png");
     m_tabletPixmap = new QPixmap("img/tablet.png");
-    m_trashbinPixmap = new QPixmap("img/trashbin3.png");
+    m_trashbinPixmap = new QPixmap("img/trashbin.png");
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -68,10 +77,6 @@ Game::Game(QSize size, QObject *parent) :
     m_view->setRenderHint(QPainter::Antialiasing);
     m_view->setCacheMode(QGraphicsView::CacheBackground);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    //m_view->setDragMode(QGraphicsView::ScrollHandDrag);
-    //m_view->setWindowTitle("GRAB TO THE FUTURE");
-    //m_view->setFixedSize(m_size);
-    //m_view->setWindowState(Qt::WindowMaximized);
     m_view->showFullScreen();
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -424,4 +429,5 @@ void Game::gameOver()
     m_gameScene->addItem(button);
     QObject::connect(button, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 }
+
 

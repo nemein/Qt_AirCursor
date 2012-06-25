@@ -4,7 +4,6 @@
 */
 
 #include <QMetaType>
-#include <qmath.h>
 #include "aircursor.h"
 
 // how much running grab value is affected by new values
@@ -49,8 +48,6 @@ const int CONTOUR_MIN_SIZE = 1000;
 
 const QString SETTINGS_FILENAME = "aircursor.ini";
 
-AirCursor* AirCursor::m_instance = 0;
-
 AirCursor::AirCursor(QObject *parent) :
     QThread(parent),
     m_grabbing(false),
@@ -70,7 +67,10 @@ AirCursor::AirCursor(QObject *parent) :
 }
 
 AirCursor::~AirCursor()
-{   
+{
+    stop();
+    while (isRunning());
+
     if (m_debugImage)
     {
         delete m_debugImage;
@@ -270,7 +270,6 @@ bool AirCursor::init(bool makeDebugImage)
         return false;
     }
 
-
     m_pushDetector.RegisterPush(this, pushCB);
     m_sessionManager.AddListener(&m_pushDetector);
 
@@ -297,13 +296,6 @@ bool AirCursor::init(bool makeDebugImage)
 
     m_init = true;
     return true;
-}
-
-void AirCursor::stopRunning()
-{
-    static QMutex mutex;
-    QMutexLocker locker(&mutex);
-    m_quit = true;
 }
 
 void AirCursor::run()
@@ -335,7 +327,13 @@ void AirCursor::run()
         quit = m_quit;
         mutex.unlock();
     }
-    m_context.Shutdown();
+}
+
+void AirCursor::stop()
+{
+    static QMutex mutex;
+    QMutexLocker locker(&mutex);
+    m_quit = true;
 }
 
 void AirCursor::analyzeGrab()
@@ -579,27 +577,10 @@ void AirCursor::analyzeGrab()
 
     if (m_debugImageEnabled)
     {
-        // put debug strings on the debug image
-
-        CvFont font;
-        cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 2.5);
-
-        // probably not the bestest way to draw outlined text :E
-        const char* cStr = QString("hand distance: " + QString::number(m_handPosRealWorld.Z) + " mm").toStdString().c_str();
-        int textX = 10; int textY = DEPTH_MAP_SIZE_Y - 10;
-        cvPutText(m_iplDebugImage, cStr, cvPoint(textX, textY - 2), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr, cvPoint(textX + 2, textY), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr, cvPoint(textX - 2, textY), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr, cvPoint(textX, textY + 2), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr, cvPoint(textX, textY), &font, cvScalar(0, 0, 255, 0));
-
-        textY -= 40;
-        const char* cStr2 = QString("defects: " + QString::number(numOfValidDefects)).toStdString().c_str();
-        cvPutText(m_iplDebugImage, cStr2, cvPoint(textX, textY - 2), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr2, cvPoint(textX + 2, textY), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr2, cvPoint(textX - 2, textY), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr2, cvPoint(textX, textY + 2), &font, cvScalar(0, 0, 127, 0));
-        cvPutText(m_iplDebugImage, cStr2, cvPoint(textX, textY), &font, cvScalar(0, 0, 255, 0));
+        // debug strings
+        QList<QString> debugStrings;
+        debugStrings.push_back(QString("hand distance: " + QString::number(m_handPosRealWorld.Z) + " mm").toStdString().c_str());
+        debugStrings.push_back(QString("defects: " + QString::number(numOfValidDefects)).toStdString().c_str());
 
         // convert iplDebugImage to QImage
         char* scanLinePtr = m_iplDebugImage->imageData;
@@ -608,10 +589,11 @@ void AirCursor::analyzeGrab()
             scanLinePtr += DEPTH_MAP_SIZE_X * 3;
         }
 
-        emit debugImageUpdate(*m_debugImage);
+        emit debugUpdate(*m_debugImage, debugStrings);
     }
 }
 
+// update grab state based on running grab value
 void AirCursor::updateState()
 {
     m_runningGrab = GRAB_SMOOTHING_FACTOR * m_runningGrab + (1.0 - GRAB_SMOOTHING_FACTOR) * (float)m_currentGrab;
@@ -634,6 +616,7 @@ void AirCursor::updateState()
     }
 }
 
+// add new raw hand position and update smoothed position
 void AirCursor::newHandPoint(qreal x, qreal y, qreal z)
 {
     XnPoint3D hp;
@@ -655,12 +638,7 @@ void AirCursor::newHandPoint(qreal x, qreal y, qreal z)
     m_handPosSmooth.Z = cumulHp.Z / m_handPoints.size();
 }
 
-void AirCursor::quit()
-{
-    static QMutex mutex;
-    QMutexLocker locker(&mutex);
-    m_quit = true;
-}
+
 
 
 
