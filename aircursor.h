@@ -1,6 +1,15 @@
 /*
     Air Cursor library for Qt applications using Kinect
     Copyright (C) 2012 Tuomas Haapala, Nemein
+    
+    Quick instructions:
+    
+    1. Make sure dependencies (OpenNI, Nite, OpenCV) are included in your .pro file
+    2. Add aircursor.h and aircursor.cpp to your project
+    3. Instantiate AirCursor class in your code
+    4. Call AirCursor::init()
+    5. Connect AirCursor signals to your QObjects
+    6. Call AirCursor::start()
 */
 
 #ifndef AIRCURSOR_H

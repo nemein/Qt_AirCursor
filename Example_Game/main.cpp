@@ -1,11 +1,15 @@
 /*
     Air Cursor library for Qt applications using Kinect
     Copyright (C) 2012 Tuomas Haapala, Nemein
-
+    
     ---
 
     A simple game demonstrating how Air Cursor can be used in
     hand tracking and grabbing.
+    
+    Mouse pic by lunik, from openclipart.org
+    Joystick pic by brunurb, from openclipart.org
+    Tablet pic by ARBY JONES, from clker.com
 */
 
 #include <QtGui/QApplication>
